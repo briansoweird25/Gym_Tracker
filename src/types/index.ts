@@ -10,3 +10,21 @@ export type Profile = {
   experience_level: ExperienceLevel | null;
   days_per_week: number | null;
 };
+
+export type Exercise = {
+  id: string;
+  name: string;
+  muscle_group: string;
+  equipment: string;
+  difficulty: ExperienceLevel;
+  instructions: string;
+};
+
+export type Angle = 'front' | 'side';
+export type ExerciseMedia = {
+  id: string;
+  exercise_id: string;
+  storage_path: string;
+  angle: Angle | null;
+  media_type: 'video' | 'poster';
+};
