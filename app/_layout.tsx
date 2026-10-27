@@ -1,11 +1,12 @@
 import '../global.css';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { isProfileComplete, useProfile } from '../src/features/auth/api';
 import { resolveRoute } from '../src/features/auth/gate';
 import { initLocal } from '../src/services/bootstrap';
+import { queryClient } from '../src/lib/queryClient';
 import { colors } from '../src/lib/theme';
 import { supabase } from '../src/lib/supabase';
 import { useSessionStore } from '../src/stores/sessionStore';
@@ -47,9 +48,8 @@ function AuthGate() {
 }
 
 export default function RootLayout() {
-  const [client] = useState(() => new QueryClient());
   return (
-    <QueryClientProvider client={client}>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="light" />
       <AuthGate />
     </QueryClientProvider>

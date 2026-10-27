@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { colors, tabs } from '../../src/lib/theme';
 
@@ -12,7 +13,7 @@ export default function TabsLayout() {
       }}
     >
       {tabs.map((t) => (
-        <Tabs.Screen key={t.name} name={t.name} options={{ title: t.title }} />
+        <Tabs.Screen key={t.name} name={t.name} options={{ title: t.title, tabBarIcon: ({ color, size }) => <Ionicons name={t.icon} color={color as string} size={size} /> }} />
       ))}
     </Tabs>
   );
