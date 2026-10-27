@@ -3,13 +3,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { isProfileComplete, useProfile } from '../src/features/auth/api';
+import { resolveRoute } from '../src/features/auth/gate';
 import { colors } from '../src/lib/theme';
 import { supabase } from '../src/lib/supabase';
 import { useSessionStore } from '../src/stores/sessionStore';
 
-export default function RootLayout() {
-  const [client] = useState(() => new QueryClient());
+function AuthGate() {
   const { session, ready, setSession } = useSessionStore();
+  const profile = useProfile(session?.user.id);
   const segments = useSegments();
   const router = useRouter();
 
@@ -19,18 +21,26 @@ export default function RootLayout() {
     return () => data.subscription.unsubscribe();
   }, [setSession]);
 
-  // Auth gate: signed-out users stay in (auth); signed-in users leave it.
   useEffect(() => {
-    if (!ready) return;
-    const inAuth = segments[0] === '(auth)';
-    if (!session && !inAuth) router.replace('/(auth)/sign-in');
-    else if (session && inAuth) router.replace('/(tabs)');
-  }, [ready, session, segments, router]);
+    if (!ready || (session && profile.isPending)) return;
+    const target = resolveRoute({
+      session: !!session,
+      profileComplete: isProfileComplete(profile.data),
+      group: segments[0],
+      screen: (segments as string[])[1],
+    });
+    if (target) router.replace(target as never);
+  }, [ready, session, profile.isPending, profile.data, segments, router]);
 
+  return <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />;
+}
+
+export default function RootLayout() {
+  const [client] = useState(() => new QueryClient());
   return (
     <QueryClientProvider client={client}>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
+      <AuthGate />
     </QueryClientProvider>
   );
 }
