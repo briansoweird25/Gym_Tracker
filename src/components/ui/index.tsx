@@ -72,3 +72,19 @@ export function Loading() {
     </View>
   );
 }
+
+export function Stepper({ label, value, onChange, min, max, step = 1 }: {
+  label: string; value: number; onChange: (v: number) => void; min: number; max: number; step?: number;
+}) {
+  const btn = 'h-11 w-11 items-center justify-center rounded-lg bg-surface';
+  return (
+    <View className="items-center gap-1">
+      <Text className="text-xs text-muted">{label}</Text>
+      <View className="flex-row items-center gap-2">
+        <Pressable accessibilityLabel={`Decrease ${label}`} className={btn} onPress={() => onChange(Math.max(min, value - step))}><Text className="text-text">−</Text></Pressable>
+        <Text className="min-w-8 text-center text-base text-text">{value}</Text>
+        <Pressable accessibilityLabel={`Increase ${label}`} className={btn} onPress={() => onChange(Math.min(max, value + step))}><Text className="text-text">+</Text></Pressable>
+      </View>
+    </View>
+  );
+}
