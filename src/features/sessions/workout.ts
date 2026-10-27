@@ -18,6 +18,7 @@ export type SessionExercise = {
 };
 export type ActiveSession = {
   id: string;
+  user_id: string | null;
   plan_day_id: string | null;
   started_at: number;
   currentIndex: number;
@@ -30,9 +31,10 @@ export type PlanDayInput = {
 };
 type IdFn = () => string;
 
-export function createSession(day: PlanDayInput, now: number, id: IdFn = newId): ActiveSession {
+export function createSession(day: PlanDayInput, now: number, id: IdFn = newId, userId: string | null = null): ActiveSession {
   return {
     id: id(),
+    user_id: userId,
     plan_day_id: day.plan_day_id,
     started_at: now,
     currentIndex: 0,

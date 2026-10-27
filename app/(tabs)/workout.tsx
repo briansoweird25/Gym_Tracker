@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { ActiveWorkoutScreen } from '../../src/components/workout/ActiveWorkoutScreen';
 import { Button, EmptyState, ErrorState, Loading } from '../../src/components/ui';
+import { syncNow } from '../../src/services/bootstrap';
 import { usePlans } from '../../src/features/plans/api';
 import { loadPlanDayInput } from '../../src/features/sessions/api';
 import { useSessionStore } from '../../src/stores/sessionStore';
@@ -13,12 +14,14 @@ export default function Workout() {
   const userId = useSessionStore((s) => s.session?.user.id);
   const active = useWorkoutStore((s) => s.session);
   const start = useWorkoutStore((s) => s.start);
+  const hydrated = useWorkoutStore((s) => s.hydrated);
   const plans = usePlans(userId);
   const [starting, setStarting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  if (!hydrated) return <Loading />;
   if (active) {
-    return <ActiveWorkoutScreen onFinished={() => router.replace({ pathname: '/session/[id]', params: { id: useWorkoutStore.getState().finished!.id } })} />;
+    return <ActiveWorkoutScreen onFinished={() => { syncNow(); router.replace({ pathname: '/session/[id]', params: { id: useWorkoutStore.getState().finished!.id } }); }} />;
   }
   if (plans.isPending) return <Loading />;
   if (plans.error) return <ErrorState message="Could not load your routine." onRetry={plans.refetch} />;
@@ -43,7 +46,7 @@ export default function Workout() {
               setStarting(day.id);
               setError(null);
               try {
-                start(await loadPlanDayInput(day));
+                await start(await loadPlanDayInput(day), userId!);
               } catch (e) {
                 setError(e instanceof Error ? e.message : 'Could not start the workout');
               } finally {
