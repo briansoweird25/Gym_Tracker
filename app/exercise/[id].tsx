@@ -21,7 +21,7 @@ export default function ExerciseScreen() {
         <Pill label={e.equipment} color="#8b97a5" />
         <Pill label={e.difficulty} color="#ffb454" />
       </View>
-      <ExerciseAnimationPlayer media={data.media} />
+      <ExerciseAnimationPlayer media={data.media} exerciseName={e.name} />
       <Card>
         <SectionLabel>How to</SectionLabel>
         <Text className="text-base leading-6 text-text">{e.instructions}</Text>

@@ -19,7 +19,7 @@ export function ActiveWorkoutScreen({ onFinished }: { onFinished: () => void }) 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-5 pb-10 pt-12" keyboardShouldPersistTaps="handled">
       <WorkoutHeader session={session} />
-      <ExerciseAnimationPlayer media={exercise.media} />
+      <ExerciseAnimationPlayer media={exercise.media} exerciseName={exercise.name} />
       <RestTimer session={session} onSkip={onSkip} />
       <ExerciseInformation exercise={exercise} />
       {/* key resets the input fields per exercise without touching the player above */}
