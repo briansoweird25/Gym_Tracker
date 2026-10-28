@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { ExerciseCatalog } from '../../components/exercise/ExerciseCatalog';
-import { Button, Chip, Stepper, TextField } from '../../components/ui';
+import { Button, Card, Chip, Stepper, TextField } from '../../components/ui';
 import { useExercises } from '../exercises/api';
 import {
   addDay, addExercise, emptyDraft, moveExercise, removeDay, removeExercise, updateExercise, validateDraft, type PlanDraft,
@@ -26,9 +26,9 @@ export function PlanBuilder({ onSave, onCancel, saving }: { onSave: (d: PlanDraf
     <ScrollView contentContainerClassName="gap-4 pb-8">
       <TextField label="Routine name" value={draft.name} onChangeText={(name) => setDraft({ ...draft, name })} />
       {draft.days.map((day) => (
-        <View key={day.id} className="gap-3 rounded-xl border border-border bg-surface p-3">
+        <Card key={day.id} className="gap-3">
           <View className="flex-row items-center justify-between">
-            <Text className="text-base font-semibold text-text">{day.name}</Text>
+            <Text className="text-lg font-extrabold text-text">{day.name}</Text>
             <Pressable accessibilityRole="button" onPress={() => setDraft(removeDay(draft, day.id))}><Text className="text-danger">Remove day</Text></Pressable>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
@@ -58,7 +58,7 @@ export function PlanBuilder({ onSave, onCancel, saving }: { onSave: (d: PlanDraf
             </View>
           ))}
           <Button title="Add exercise" variant="secondary" onPress={() => setPicking(day.id)} />
-        </View>
+        </Card>
       ))}
       <Button title="Add day" variant="secondary" onPress={() => setDraft(addDay(draft, `Day ${draft.days.length + 1}`, null))} />
       {errors.map((e) => <Text key={e} className="text-danger">{e}</Text>)}

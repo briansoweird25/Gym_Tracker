@@ -1,7 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { Button, ErrorState, Loading, TextField } from '../../src/components/ui';
+import { Ionicons } from '@expo/vector-icons';
+import { Button, Card, ErrorState, Hero, Loading, SectionLabel, TextField } from '../../src/components/ui';
+import { colors } from '../../src/lib/theme';
 import { signOut, useProfile } from '../../src/features/auth/api';
 import { addBodyWeight } from '../../src/features/progress/api';
 import { useSessionStore } from '../../src/stores/sessionStore';
@@ -38,14 +40,28 @@ export default function Profile() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-4 pt-14">
-      <Text className="text-2xl font-bold text-text">{p.name}</Text>
-      <View className="gap-1 rounded-xl bg-surface p-3">
-        <Text className="text-text">{`Goal: ${pretty(p.goal)}`}</Text>
-        <Text className="text-text">{`Experience: ${pretty(p.experience_level)}`}</Text>
-        <Text className="text-text">{`Days per week: ${p.days_per_week ?? '—'}`}</Text>
-        <Text className="text-muted">{session?.user.email}</Text>
-      </View>
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-5 p-5 pt-14">
+      <Hero>
+        <View className="flex-row items-center gap-4">
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-white/15">
+            <Text className="text-2xl font-extrabold text-white">{(p.name ?? 'A').slice(0, 1).toUpperCase()}</Text>
+          </View>
+          <View className="flex-1">
+            <Text className="text-2xl font-extrabold text-white">{p.name}</Text>
+            <Text className="text-sm text-white/70">{session?.user.email}</Text>
+          </View>
+        </View>
+      </Hero>
+      <Card className="gap-0 p-2">
+        {([['flag', 'Goal', pretty(p.goal)], ['trending-up', 'Experience', pretty(p.experience_level)], ['calendar', 'Days per week', String(p.days_per_week ?? '—')]] as const).map(([icon, label, value]) => (
+          <View key={label} className="flex-row items-center gap-3 p-3">
+            <Ionicons name={icon} size={20} color={colors.accent} />
+            <Text className="flex-1 text-muted">{label}</Text>
+            <Text className="font-bold capitalize text-text">{value}</Text>
+          </View>
+        ))}
+      </Card>
+      <SectionLabel>Body weight</SectionLabel>
       <TextField label="Log body weight (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" error={error ?? undefined} />
       <Button title="Save weight" onPress={save} loading={saving} />
       <Button title="Sign out" variant="secondary" onPress={() => signOut()} />

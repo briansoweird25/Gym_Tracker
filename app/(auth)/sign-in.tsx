@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { signIn } from '../../src/features/auth/api';
 import { validateCredentials, type CredentialErrors } from '../../src/features/auth/validation';
-import { Button, TextField } from '../../src/components/ui';
+import { Brand, Button, TextField } from '../../src/components/ui';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -25,7 +25,8 @@ export default function SignIn() {
 
   return (
     <View className="flex-1 justify-center gap-4 bg-background p-6">
-      <Text className="text-3xl font-bold text-text">Welcome back</Text>
+      <Brand />
+      <Text className="text-3xl font-extrabold text-text">Welcome back</Text>
       <TextField label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" error={errors.email} />
       <TextField label="Password" value={password} onChangeText={setPassword} secureTextEntry error={errors.password} />
       {formError ? <Text className="text-danger">{formError}</Text> : null}

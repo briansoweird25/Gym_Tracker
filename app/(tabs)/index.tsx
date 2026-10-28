@@ -1,10 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
-import { Button, ErrorState, Loading } from '../../src/components/ui';
+import { Button, Card, ErrorState, Hero, IconBadge, Loading, SectionLabel, StatTile } from '../../src/components/ui';
 import { useProfile } from '../../src/features/auth/api';
 import { usePlans } from '../../src/features/plans/api';
 import { useHistory } from '../../src/features/progress/api';
-import { sessionSummaries, weeklyCount } from '../../src/features/progress/stats';
+import { personalBests, sessionSummaries, weeklyCount } from '../../src/features/progress/stats';
+import { colors } from '../../src/lib/theme';
 import { useSessionStore } from '../../src/stores/sessionStore';
 import { useWorkoutStore } from '../../src/stores/workoutStore';
 
@@ -20,29 +22,71 @@ export default function Home() {
   if (profile.error || plans.error || history.error) {
     return <ErrorState message="Could not load your dashboard." onRetry={() => { profile.refetch(); plans.refetch(); history.refetch(); }} />;
   }
+  const name = profile.data?.name;
   const active = plans.data?.find((p) => p.is_active);
+  const target = profile.data?.days_per_week ?? 0;
   const done = weeklyCount(history.data, new Date());
-  const last = sessionSummaries(history.data)[0];
+  const summaries = sessionSummaries(history.data);
+  const last = summaries[0];
+  const exerciseCount = active?.plan_days.reduce((n, d) => n + d.plan_exercises.length, 0) ?? 0;
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-4 pt-14">
-      <Text className="text-2xl font-bold text-text">{`Hi${profile.data?.name ? `, ${profile.data.name}` : ''}`}</Text>
-      <View className="gap-1 rounded-xl bg-surface p-4">
-        <Text className="text-sm text-muted">This week</Text>
-        <Text className="text-3xl font-bold text-text">{`${done} / ${profile.data?.days_per_week ?? '—'}`}</Text>
-        <Text className="text-sm text-muted">workouts completed</Text>
-      </View>
-      <View className="gap-2 rounded-xl bg-surface p-4">
-        <Text className="text-sm text-muted">{resuming ? 'Workout in progress' : 'Active routine'}</Text>
-        <Text className="text-lg font-semibold text-text">{active?.name ?? 'None yet'}</Text>
-        <Button title={resuming ? 'Resume workout' : active ? 'Go to workout' : 'Create a routine'} onPress={() => router.navigate(active || resuming ? '/(tabs)/workout' : '/(tabs)/plans')} />
-      </View>
-      {last && (
-        <View className="gap-1 rounded-xl bg-surface p-4">
-          <Text className="text-sm text-muted">Last workout</Text>
-          <Text className="text-text">{`${new Date(last.date).toLocaleDateString()} · ${last.totalSets} sets · ${Math.round(last.volume)} kg`}</Text>
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-5 p-5 pt-14">
+      <View className="flex-row items-center justify-between">
+        <View>
+          <Text className="text-sm text-muted">Welcome back</Text>
+          <Text className="text-3xl font-extrabold text-text">{name ?? 'Athlete'}</Text>
         </View>
-      )}
+        <View className="h-12 w-12 items-center justify-center rounded-full bg-surface2">
+          <Text className="text-lg font-extrabold text-accent">{(name ?? 'A').slice(0, 1).toUpperCase()}</Text>
+        </View>
+      </View>
+
+      <Hero>
+        <Text className="text-xs font-semibold uppercase tracking-widest text-white/70">{resuming ? 'Workout in progress' : 'Active routine'}</Text>
+        <Text className="text-3xl font-extrabold text-white">{active?.name ?? 'No routine yet'}</Text>
+        {active ? <Text className="text-sm text-white/70">{`${active.plan_days.length} days · ${exerciseCount} exercises`}</Text> : null}
+        <View className="pt-2">
+          <Button
+            variant="light"
+            title={resuming ? 'Resume workout' : active ? 'Start workout' : 'Create a routine'}
+            onPress={() => router.navigate(active || resuming ? '/(tabs)/workout' : '/(tabs)/plans')}
+          />
+        </View>
+      </Hero>
+
+      <Card>
+        <View className="flex-row items-center justify-between">
+          <SectionLabel>This week</SectionLabel>
+          <Text className="text-sm font-bold text-text">{`${done} of ${target || '—'}`}</Text>
+        </View>
+        <View className="flex-row gap-2 pt-1">
+          {Array.from({ length: Math.max(target, done, 1) }, (_, i) => (
+            <View key={i} className={`h-11 flex-1 items-center justify-center rounded-xl ${i < done ? 'bg-accent' : 'border border-border bg-surface2'}`}>
+              {i < done ? <Ionicons name="checkmark" size={20} color={colors.background} /> : null}
+            </View>
+          ))}
+        </View>
+      </Card>
+
+      <View className="flex-row gap-3">
+        <StatTile icon="flame" label="Workouts" value={String(history.data.length)} color={colors.warn} />
+        <StatTile icon="trophy" label="Personal bests" value={String(personalBests(history.data).length)} color={colors.accent2} />
+        <StatTile icon="barbell" label="Last volume" value={last ? `${Math.round(last.volume / 10) / 100}t` : '—'} color={colors.accent} />
+      </View>
+
+      {last ? (
+        <Card>
+          <SectionLabel>Last workout</SectionLabel>
+          <View className="flex-row items-center gap-3">
+            <IconBadge icon="time-outline" color={colors.accent2} />
+            <View>
+              <Text className="text-base font-bold text-text">{new Date(last.date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</Text>
+              <Text className="text-sm text-muted">{`${last.totalSets} sets · ${Math.round(last.volume)} kg · ${last.minutes} min`}</Text>
+            </View>
+          </View>
+        </Card>
+      ) : null}
     </ScrollView>
   );
 }

@@ -34,8 +34,11 @@ export default function Onboarding() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-5 p-6">
-      <Text className="text-3xl font-bold text-text">Set your goal</Text>
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-5 p-6 pt-14">
+      <View className="gap-1">
+        <Text className="text-3xl font-extrabold text-text">Set your goal</Text>
+        <Text className="text-base text-muted">We use this to tailor your routine.</Text>
+      </View>
       <TextField label="Name" value={v.name} onChangeText={(name) => setV({ ...v, name })} error={errors.name} />
       <Section title="Goal" error={errors.goal}>
         {GOALS.map((g) => <Chip key={g} label={label(g)} selected={v.goal === g} onPress={() => setV({ ...v, goal: g })} />)}
@@ -55,7 +58,7 @@ export default function Onboarding() {
 function Section({ title, error, children }: { title: string; error?: string; children: React.ReactNode }) {
   return (
     <View className="gap-2">
-      <Text className="text-sm text-muted">{title}</Text>
+      <Text className="text-xs font-semibold uppercase tracking-widest text-muted">{title}</Text>
       <View className="flex-row flex-wrap gap-2">{children}</View>
       {error ? <Text className="text-sm text-danger">{error}</Text> : null}
     </View>

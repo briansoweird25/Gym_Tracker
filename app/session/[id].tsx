@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
-import { Button, EmptyState, ErrorState, Loading } from '../../src/components/ui';
+import { Button, Card, EmptyState, ErrorState, Hero, IconBadge, Loading } from '../../src/components/ui';
 import { useHistory } from '../../src/features/progress/api';
 import { sessionSummaries } from '../../src/features/progress/stats';
 import { summarize } from '../../src/features/sessions/workout';
@@ -37,17 +37,23 @@ export default function SessionSummary() {
 
   if (!justFinished && history.isPending) return <Loading />;
   if (!justFinished && history.error) return <ErrorState message="Could not load this workout." onRetry={history.refetch} />;
-  if (!view) return <EmptyState title="Workout not found" hint="It may still be syncing. Try again shortly." />;
+  if (!view) return <EmptyState icon="search-outline" title="Workout not found" hint="It may still be syncing. Try again shortly." />;
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-4 pt-14">
-      <Text className="text-3xl font-bold text-text">{justFinished ? 'Workout complete' : 'Workout'}</Text>
-      <Text className="text-base text-muted">{view.stats}</Text>
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-5 pt-14">
+      <Hero>
+        <Text className="text-xs font-semibold uppercase tracking-widest text-white/70">{justFinished ? 'Nice work' : 'Past session'}</Text>
+        <Text className="text-3xl font-extrabold text-white">{justFinished ? 'Workout complete' : 'Workout'}</Text>
+        <Text className="text-base text-white/80">{view.stats}</Text>
+      </Hero>
       {view.exercises.map((e) => (
-        <View key={e.id} className="gap-1 rounded-xl bg-surface p-3">
-          <Text className="text-base font-semibold text-text">{e.name}</Text>
+        <Card key={e.id}>
+          <View className="flex-row items-center gap-3">
+            <IconBadge icon="barbell" size={36} />
+            <Text className="text-base font-extrabold text-text">{e.name}</Text>
+          </View>
           {e.sets.map((s) => <Text key={s.id} className="text-muted">{s.line}</Text>)}
-        </View>
+        </Card>
       ))}
       <Button title="Done" onPress={() => (justFinished ? router.replace('/(tabs)') : router.back())} />
     </ScrollView>

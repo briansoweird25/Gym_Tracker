@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { ActiveWorkoutScreen } from '../../src/components/workout/ActiveWorkoutScreen';
-import { Button, EmptyState, ErrorState, Loading } from '../../src/components/ui';
+import { Card, Button, EmptyState, ErrorState, IconBadge, Loading, ScreenTitle } from '../../src/components/ui';
 import { syncNow } from '../../src/services/bootstrap';
 import { usePlans } from '../../src/features/plans/api';
 import { loadPlanDayInput } from '../../src/features/sessions/api';
@@ -28,17 +28,22 @@ export default function Workout() {
 
   const plan = plans.data?.find((p) => p.is_active);
   if (!plan) {
-    return <EmptyState title="No active routine" hint="Create a routine in Plans and set it active to start a workout." />;
+    return <EmptyState icon="barbell-outline" title="No active routine" hint="Create a routine in Plans and set it active to start a workout." />;
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-3 p-4 pt-14">
-      <Text className="text-2xl font-bold text-text">{plan.name}</Text>
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-5 pt-14">
+      <ScreenTitle title="Workout" subtitle={plan.name} />
       {error ? <Text className="text-danger">{error}</Text> : null}
       {plan.plan_days.map((day) => (
-        <View key={day.id} className="gap-2 rounded-xl border border-border bg-surface p-3">
-          <Text className="text-base font-semibold text-text">{day.name}</Text>
-          <Text className="text-sm text-muted">{day.plan_exercises.length} exercises</Text>
+        <Card key={day.id}>
+          <View className="flex-row items-center gap-3">
+            <IconBadge icon="flash" />
+            <View>
+              <Text className="text-lg font-extrabold text-text">{day.name}</Text>
+              <Text className="text-sm text-muted">{day.plan_exercises.length} exercises</Text>
+            </View>
+          </View>
           <Button
             title="Start workout"
             loading={starting === day.id}
@@ -54,7 +59,7 @@ export default function Workout() {
               }
             }}
           />
-        </View>
+        </Card>
       ))}
     </ScrollView>
   );

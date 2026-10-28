@@ -9,7 +9,8 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, minHeight: 56 },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, minHeight: 64, paddingTop: 6 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}
     >
       {tabs.map((t) => (

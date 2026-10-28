@@ -17,7 +17,7 @@ export function ActiveWorkoutScreen({ onFinished }: { onFinished: () => void }) 
 
   if (!session || !exercise) return null;
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-4 pb-10" keyboardShouldPersistTaps="handled">
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-5 pb-10 pt-12" keyboardShouldPersistTaps="handled">
       <WorkoutHeader session={session} />
       <ExerciseAnimationPlayer media={exercise.media} />
       <RestTimer session={session} onSkip={onSkip} />
